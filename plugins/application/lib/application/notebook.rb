@@ -29,13 +29,18 @@ module Redcar
     #
     # Events: tab_added (tab)
     def new_tab(tab_class)
-      tab = tab_class.new(self)
-      attach_tab_listeners(tab)
-      notify_listeners(:tab_added, tab) do
-        @tabs << tab
+      begin
+        tab = tab_class.new(self)
+        attach_tab_listeners(tab)
+        notify_listeners(:tab_added, tab) do
+          @tabs << tab
+        end
+        Redcar.app.call_on_plugins(:tab_added, tab)
+        tab
+      rescue
+        remove_tab!(tab) if tab
+        raise
       end
-      Redcar.app.call_on_plugins(:tab_added, tab)
-      tab
     end
     
     # Moves a tab from another notebook to this notebook.

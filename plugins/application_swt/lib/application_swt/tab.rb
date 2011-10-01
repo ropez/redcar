@@ -7,7 +7,12 @@ module Redcar
       def initialize(model, notebook, position = nil)
         @model, @notebook = model, notebook
         create_item_widget(position || @notebook.tab_folder.item_count)
-        create_tab_widget
+        begin
+          create_tab_widget
+        rescue
+          @item.dispose if @item
+          raise
+        end
         attach_listeners
       end
       
